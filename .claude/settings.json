@@ -2,6 +2,28 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "agent": "orchestrator",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "bash .claude/hooks/pretool-write-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "bash .claude/hooks/pretool-bash.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
@@ -14,6 +36,18 @@
         ]
       }
     ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
@@ -21,7 +55,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "if [ -f .ai/activity/log.md ] && [ -z \"$(find .ai/activity/log.md -mmin -60 2>/dev/null)\" ]; then echo 'REMINDER: .ai/activity/log.md was not updated in this session. If you made substantive changes (file edits, tests run, decisions), prepend an entry before ending.'; fi"
+            "command": "bash .claude/hooks/stop-reminder.sh"
           }
         ]
       }

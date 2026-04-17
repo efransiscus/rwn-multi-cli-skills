@@ -1,5 +1,7 @@
 # Implement 7 hooks for Claude Code
-Status: OPEN
+Status: DONE
+Completed: 2026-04-17 22:10 — claude-code
+Output: 4 new scripts under .claude/hooks/, .claude/settings.json rewritten with PreToolUse + SessionStart + updated Stop blocks, validation handoff at .ai/handoffs/to-kiro/open/005-validate-claude-hooks.md.
 Sender: kiro-cli
 Recipient: claude-code
 Created: 2026-04-17 21:39

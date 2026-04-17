@@ -1,3 +1,8 @@
+## 2026-04-17 09:09 — kimi-cli
+- Action: Implemented 7 hooks per handoff 015 from kiro-cli.
+- Files: ~/.kimi/config.toml (edit), .kimi/hooks/{root-guard,framework-guard,sensitive-guard,destructive-guard,git-status,handoffs-remind,git-dirty-remind,activity-log-inject,activity-log-remind}.sh (new/fix)
+- Decisions: Stored all hooks as bash scripts in .kimi/hooks/ (not inline in config.toml) to avoid TOML quote-escaping hell on Windows. Fixed existing activity-log hook paths (.ai/activity/log.md → .ai/activity-log.md). Used PreToolUse for guards (blocks before write — safer than Kiro post-hoc). Used SessionStart for git-status + handoffs reminder (run in parallel). Added git-dirty-remind as second Stop hook alongside existing activity-log-remind. Python JSON parsing with fail-open fallback.
+
 ## 2026-04-17 09:02 — kimi-cli
 - Action: Wrote hooks recommendation per handoff 014 from kiro-cli.
 - Files: .ai/research/hooks-recommendation-kimi.md (new)
