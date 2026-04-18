@@ -7,7 +7,7 @@ invoked by `~/.kimi/config.toml`.
 
 | Hook | Event | Matcher | Script | Purpose |
 |------|-------|---------|--------|---------|
-| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | Block writes to project root except AGENTS.md, README.md, CLAUDE.md |
+| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | Block writes to project root except ADR Category A allowlist (AGENTS.md, README.md, CLAUDE.md, LICENSE, CHANGELOG, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .mcp.json) |
 | Framework dir guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `framework-guard.sh` | Block writes to `.claude/` and `.kiro/` (other CLIs' dirs) |
 | Sensitive file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `sensitive-guard.sh` | Block writes to `.env*`, `*.key`, `*.pem`, `id_rsa*`, `.aws/`, `.ssh/` |
 | Destructive cmd guard | `PreToolUse` | `Shell` | `destructive-guard.sh` | Block `rm -rf /`, `git push --force`, `git reset --hard`, `DROP TABLE/DATABASE` |

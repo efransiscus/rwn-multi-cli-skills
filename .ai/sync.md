@@ -74,12 +74,46 @@ Copy-Item .ai/instructions/orchestrator-pattern/principles.md .kiro/steering/orc
 
 ## Project-agnostic install (use this framework in another project)
 
+### Bash / Git Bash / macOS / Linux
+
 ```bash
 # From inside this project, targeting another project at <target>:
 cp -R .ai CLAUDE.md .claude .kimi .kiro <target>/
 
 # Reset the activity log in the target so it starts empty:
 printf '# Activity Log\n\nNewest entries at the top. Each CLI prepends before finishing substantive work.\n\n---\n\n' > <target>/.ai/activity/log.md
+
+# Reset cross-CLI handoff history — cloned project starts with empty queues
+rm -rf <target>/.ai/handoffs/to-claude/{open,done}/*
+rm -rf <target>/.ai/handoffs/to-kimi/{open,done}/*
+rm -rf <target>/.ai/handoffs/to-kiro/{open,done}/*
+
+# Reset LICENSE placeholders — year + author are template TODOs
+sed -i.bak 's/Copyright (c) 2026 \[TODO: project author \/ organization\]/Copyright (c) [TODO: YEAR] [TODO: project author]/' <target>/LICENSE && rm -f <target>/LICENSE.bak
+```
+
+### PowerShell
+
+```powershell
+Copy-Item -Recurse .ai, CLAUDE.md, .claude, .kimi, .kiro <target>/
+
+# Reset activity log
+@"
+# Activity Log
+
+Newest entries at the top. Each CLI prepends before finishing substantive work.
+
+---
+
+"@ | Set-Content <target>/.ai/activity/log.md
+
+# Reset cross-CLI handoff history
+Remove-Item -Recurse -Force <target>/.ai/handoffs/to-claude/open/*, <target>/.ai/handoffs/to-claude/done/*
+Remove-Item -Recurse -Force <target>/.ai/handoffs/to-kimi/open/*, <target>/.ai/handoffs/to-kimi/done/*
+Remove-Item -Recurse -Force <target>/.ai/handoffs/to-kiro/open/*, <target>/.ai/handoffs/to-kiro/done/*
+
+# Reset LICENSE placeholders
+(Get-Content <target>/LICENSE) -replace 'Copyright \(c\) 2026 \[TODO: project author / organization\]', 'Copyright (c) [TODO: YEAR] [TODO: project author]' | Set-Content <target>/LICENSE
 ```
 
 The CLIs in `<target>` will auto-discover their native folders on next launch; the AI

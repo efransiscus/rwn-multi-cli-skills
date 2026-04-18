@@ -1,17 +1,13 @@
-# rwn-multi-cli-skills
+# [TODO: project name]
 
-Multi-CLI AI project using Claude Code, Kimi CLI, and Kiro CLI with shared framework.
+[TODO: one-sentence project description]
 
 ## Root file policy
 
-Keep the root clean. Only these files belong at root:
-- `AGENTS.md` — CLI-agnostic project pointer
-- `README.md` — this file
-- `CLAUDE.md` — Claude Code's auto-load contract (required at root by Claude)
-
-Everything else goes in its directory. No `package.json`, `tsconfig.json`,
-`Dockerfile`, `.env`, etc. at root — those belong in `config/`, `infra/docker/`,
-`tools/`, or wherever they fit.
+Root is strict. The authoritative allowlist lives in
+`docs/architecture/0001-root-file-exceptions.md` — new root files require an
+ADR amendment before creation. The `.claude/hooks/pretool-write-edit.sh` hook
+and the Kimi/Kiro equivalents enforce this at the tool layer.
 
 ## Project structure
 

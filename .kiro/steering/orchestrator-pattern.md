@@ -4,6 +4,10 @@ Architectural rules for multi-agent delegation in this project. All three CLIs
 (Claude Code, Kimi CLI, Kiro CLI) follow the same pattern, adapted to each CLI's
 native agent config format.
 
+**Companion doc:** `.ai/instructions/agent-catalog/principles.md` holds the
+authoritative subagent roster (13 agents with tools, write scope, shell scope).
+This file covers the *pattern*; the catalog covers the *roster*.
+
 ## The rule
 
 The default agent is a **read-only orchestrator**. It can read, search, analyze,
@@ -19,6 +23,11 @@ CLI config without needing to delegate trivial framework housekeeping.
 ### Orchestrator (default agent)
 
 **Purpose:** Consult, plan, analyze, delegate.
+
+> **`.ai/` is a direct write path for orchestrators — no delegation.** Handoffs,
+> activity-log entries, research docs, reports, and SSOT instruction edits are
+> all the orchestrator's direct responsibility. This rule is the same across
+> all three CLIs: Claude Code, Kimi CLI, Kiro CLI.
 
 **Tools (read + delegate + limited write):**
 - Read: `fs_read`, `grep`, `glob`, `code`, `introspect`, `knowledge`
@@ -43,50 +52,43 @@ CLI config without needing to delegate trivial framework housekeeping.
 7. If no existing subagent fits the task, describe what's needed (tools, skills,
    purpose) and ask the user to approve creating a new agent.
 
-### Coder (subagent)
+### Subagents
 
-**Purpose:** Write code, run commands, execute tests.
+Twelve specialized subagents handle all project mutations — `coder`, `reviewer`,
+`tester`, `debugger`, `refactorer`, `doc-writer`, `security-auditor`,
+`ui-engineer`, `e2e-tester`, `infra-engineer`, `release-engineer`,
+`data-migrator`. See `.ai/instructions/agent-catalog/principles.md` for each
+agent's tools, write scope, shell scope, and behavior rules.
 
-**Tools:** `fs_read`, `fs_write`, `execute_bash`, `grep`, `glob`, `code`
+Subagents fall into three classes:
 
-**Behavior:** Execute the orchestrator's brief. Follow Karpathy guidelines (surgical
-changes, simplicity first). Report back: files touched, commands run, test results,
-deviations from brief.
-
-### Reviewer (subagent)
-
-**Purpose:** Read-only code review — correctness, style, security, test coverage.
-
-**Tools:** `fs_read`, `grep`, `glob`, `code`, `introspect`
-
-**Behavior:** Read the scope, identify issues, suggest improvements. Return a
-structured report with severity levels and file/line references.
-
-### Future agents
-
-New agents are created when a task doesn't fit existing roles. The orchestrator
-proposes the agent spec; the user approves and creates the config file. Examples:
-- `db-migrator` — database schema changes
-- `test-runner` — focused test execution and coverage analysis
-- `deployer` — build and deployment tasks
+- **Executor** — writes files and runs commands within its declared scope
+  (`coder`, `tester`, `debugger`, `refactorer`, `doc-writer`, `ui-engineer`,
+  `infra-engineer`, `release-engineer`, `data-migrator`).
+- **Diagnoser** — primarily read-only; may write structured reports to
+  `.ai/reports/<agent>-<YYYY-MM-DD>-<slug>.md` (`reviewer`, `security-auditor`,
+  `e2e-tester`).
+- **Default** — the orchestrator itself (see above).
 
 ## Write-path restriction
 
-The orchestrator's write access is restricted to framework directories only:
+Three tiers — no agent has blanket write-everywhere access:
 
-| Path pattern | Orchestrator | Coder | Reviewer |
-|---|---|---|---|
-| `.ai/**` | ✅ write | ❌ | ❌ |
-| `.kiro/**` | ✅ write | ❌ | ❌ |
-| `.kimi/**` | ✅ write | ❌ | ❌ |
-| `.claude/**` | ✅ write | ❌ | ❌ |
-| Everything else | ❌ read-only | ✅ write | ❌ read-only |
+| Tier | Paths | Who writes |
+|---|---|---|
+| **Framework (CLI config + SSOT)** | `.ai/**`, `.kiro/**`, `.kimi/**`, `.claude/**` | Orchestrator only |
+| **Reports** | `.ai/reports/**` | Diagnosers (`reviewer`, `security-auditor`, `e2e-tester`) + orchestrator |
+| **Project source** | Everything else (`src/**`, `tests/**`, `docs/**`, `infra/**`, `migrations/**`, etc.) | Scoped executors per the catalog |
+
+Each executor's scope is explicitly bounded — e.g., `infra-engineer` writes only
+`infra/**` + CI dirs; `data-migrator` only `migrations/**` + `seeds/**`;
+`doc-writer` only `*.md` + `docs/**` + `CHANGELOG*`. See the catalog for exact
+scopes.
 
 Each CLI enforces this via its native mechanism:
-- **Kiro:** `toolsSettings.fs_write.allowedPaths` / `deniedPaths`
-- **Claude:** `permissions.allow` / `permissions.deny` in settings, or prompt-level
-- **Kimi:** `allowed_tools` + system prompt constraints (Kimi lacks path-level write
-  restriction — enforce via prompt)
+- **Kiro:** `toolsSettings.fs_write.allowedPaths` / `deniedPaths` (hard)
+- **Claude:** `tools:` frontmatter + `permissions.deny` in settings (mixed hard/soft)
+- **Kimi:** `allowed_tools` + system prompt + PostToolUse hook (soft — Kimi lacks native path restriction)
 
 ## Failure handling
 
@@ -112,13 +114,16 @@ Orchestrator reads/analyzes/plans
     │
     ├─ Framework file edit (.ai/, .kiro/, etc.) → writes directly
     │
-    └─ Project mutation needed → delegates:
+    └─ Project mutation needed → picks subagent from the catalog:
         │
         ▼
-    subagent(coder) or subagent(reviewer)
+    subagent(coder | reviewer | tester | debugger | refactorer |
+             doc-writer | security-auditor | ui-engineer |
+             e2e-tester | infra-engineer | release-engineer |
+             data-migrator)
         │
         ▼
-    Subagent executes, returns summary
+    Subagent executes within its declared scope, returns summary
         │
         ▼
     Orchestrator verifies (reads changed files)
@@ -129,24 +134,28 @@ Orchestrator reads/analyzes/plans
 
 ## Per-CLI implementation notes
 
+Each CLI implements the 13-agent catalog in its native format. See each CLI's
+`agents/` folder for the full set.
+
 ### Kiro CLI
-- Agent configs: `.kiro/agents/{orchestrator,coder,reviewer}.json`
+- Agent configs: `.kiro/agents/*.json` (13 files)
 - Delegation tool: `subagent` (DAG pipeline with stages)
-- Write restriction: `toolsSettings.fs_write.allowedPaths`
+- Write restriction: `toolsSettings.fs_write.allowedPaths` (hard)
 - Unique advantage: native DAG pipeline (multi-stage with `depends_on`)
 - Set default: `kiro-cli settings chat.defaultAgent orchestrator`
 
 ### Claude Code
-- Agent configs: `.claude/agents/{orchestrator,coder,reviewer}.md`
+- Agent configs: `.claude/agents/*.md` (13 files)
 - Delegation tool: `Agent` with `subagent_type`
 - Write restriction: `tools:` frontmatter whitelist + `permissions` in settings
 - Main-thread agent: `.claude/settings.json → "agent": "orchestrator"`
 - Unique advantage: built-in subagent types (Explore, Plan)
 
 ### Kimi CLI
-- Agent configs: `.kimi/agents/{orchestrator,coder-executor,reviewer}.yaml`
+- Agent configs: `.kimi/agents/*.yaml` (13 files; note `coder-executor` naming
+  for the coder role)
 - Delegation tool: `Agent` with `subagent_type`
-- Write restriction: `allowed_tools` + system prompt (no native path restriction)
+- Write restriction: `allowed_tools` + system prompt + PostToolUse hook
 - Launch: `kimi --agent-file .kimi/agents/orchestrator.yaml`
 - Unique advantage: `extend:` inheritance between agents
 
@@ -155,14 +164,10 @@ Orchestrator reads/analyzes/plans
 - Specific system prompt wording (each CLI adapts to its conventions)
 - MCP server configuration (project-specific, not architectural)
 - Skill/resource loading per agent (each CLI declares its own)
-- The exact agent config JSON/YAML/MD (see `.ai/research/orchestrator-{cli}.md` for
-  CLI-specific proposed configs)
-
-Those details live in each CLI's research doc and will be finalized during
-implementation.
+- The full subagent roster — see `.ai/instructions/agent-catalog/principles.md`
 
 ---
 
-**This pattern is working if:** the orchestrator never writes project source files,
-subagent failures are reported (not silently retried), and new agent types are
-proposed (not assumed).
+**This pattern is working if:** the orchestrator never writes project source
+files, subagent failures are reported (not silently retried), every agent stays
+within its declared write scope, and new agent types are proposed (not assumed).

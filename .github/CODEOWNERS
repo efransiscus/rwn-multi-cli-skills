@@ -1,0 +1,8 @@
+# Ownership rules for auto-requesting reviewers on PRs.
+# Format: <path pattern> <@user-or-team> [<@user-or-team2> ...]
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Examples (uncomment + customize when contributors are assigned):
+# *.md                    @docs-team
+# /src/                   @engineering
+# /infra/                 @platform

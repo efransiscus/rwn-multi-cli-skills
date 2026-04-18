@@ -6,12 +6,12 @@ You MAY write to framework directories only: `.ai/`, `.kiro/`, `.kimi/`, `.claud
 
 ## Root file policy
 
-Only these files are permitted at project root:
-- `AGENTS.md`
-- `README.md`
-- `CLAUDE.md`
-
-No `package.json`, `tsconfig.json`, `Dockerfile`, `.env`, or similar at root. Those belong in `config/`, `infra/docker/`, `tools/`, etc. When delegating, ensure subagents respect this policy.
+The project root allowlist lives in
+`docs/architecture/0001-root-file-exceptions.md`. Any root file not listed
+there requires an ADR amendment before creation. When delegating, tell
+subagents which directory the file belongs in (`src/`, `tests/`, `docs/`,
+`infra/`, `config/`, etc.); `.kimi/hooks/root-guard.sh` will block unapproved
+root writes at the tool layer.
 
 You MUST delegate all project-level mutations to the appropriate subagent:
 

@@ -21,13 +21,13 @@ if echo "$FILE_PATH" | grep -q '/'; then
     exit 0
 fi
 
-# Path is at root level — check allowlist
+# Path is at root level — check allowlist (ADR Category A: docs entry points)
 case "$BASENAME" in
-    AGENTS.md|README.md|CLAUDE.md)
+    AGENTS.md|README.md|CLAUDE.md|LICENSE|LICENSE.*|CHANGELOG|CHANGELOG.*|CONTRIBUTING.md|SECURITY.md|CODE_OF_CONDUCT.md|.mcp.json|.mcp.json.example)
         exit 0
         ;;
     *)
-        echo "BLOCKED: Writing '$BASENAME' to project root is not allowed. Root-level files are restricted to AGENTS.md, README.md, CLAUDE.md. Move this file to the appropriate subdirectory (e.g., config/, infra/, src/)." >&2
+        echo "BLOCKED: Writing '$BASENAME' to project root is not allowed. See docs/architecture/0001-root-file-exceptions.md for the full allowlist. Move this file to the appropriate subdirectory (e.g., config/, infra/, src/)." >&2
         exit 2
         ;;
 esac

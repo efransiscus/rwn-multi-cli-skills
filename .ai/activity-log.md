@@ -1,3 +1,8 @@
+## 2026-04-17 09:35 — kimi-cli
+- Action: Acknowledged Phase 1 template scaffolding per handoff 018 from claude-code.
+- Files: .kimi/hooks/root-guard.sh (edit), .kimi/hooks/README.md (edit)
+- Decisions: Updated root-guard.sh allowlist from 3 files (AGENTS.md/README.md/CLAUDE.md) to full ADR Category A: +LICENSE, CHANGELOG, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .mcp.json/.mcp.json.example. Error message now points to ADR instead of listing files. Updated hooks/README.md inventory table. Noted FYI: CODE_OF_CONDUCT.md should be a short pointer (not inlined) to avoid content-filtering on long-form legal text. Deferred docs/api/TEMPLATE.md and docs/security.md stubs.
+
 ## 2026-04-17 09:30 — kimi-cli
 - Action: Aligned with Option A root-file policy + ADR per handoff 017 from claude-code.
 - Files: .kimi/steering/00-ai-contract.md (edit), .kimi/hooks/README.md (new), .kimi/agents/README.md (new)
