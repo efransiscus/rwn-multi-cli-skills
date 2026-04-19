@@ -47,14 +47,16 @@ esac
 case "$rel" in
     .env|.env.*|*/\.env|*/\.env.*)
         block "Sensitive file pattern (.env*). Do not write secrets from an agent. Ask the user to edit this manually." ;;
-    *.key|*.pem|*/\.key|*/\.pem)
-        block "Sensitive file pattern (*.key, *.pem). Do not write cryptographic material from an agent. Ask the user to edit manually." ;;
+    *.key|*.pem|*.p12|*.pfx|*/\.key|*/\.pem|*/*.p12|*/*.pfx)
+        block "Sensitive file pattern (*.key, *.pem, *.p12, *.pfx). Do not write cryptographic material from an agent. Ask the user to edit manually." ;;
     id_rsa|id_rsa.*|id_ed25519|id_ed25519.*|*/id_rsa*|*/id_ed25519*)
         block "SSH private key pattern. Do not write SSH keys from an agent. Ask the user to edit manually." ;;
     .aws|.aws/*|*/\.aws|*/\.aws/*)
         block "AWS credentials directory (.aws/). Do not write AWS credentials from an agent. Ask the user to edit manually." ;;
     .ssh|.ssh/*|*/\.ssh|*/\.ssh/*)
         block "SSH config directory (.ssh/). Do not write SSH configs from an agent. Ask the user to edit manually." ;;
+    secrets.*|*.secrets|*-secrets.*|secrets/*|*/secrets.*|*/*.secrets|*/*-secrets.*|credentials|credentials.*|*-credentials.*|*/credentials|*/credentials.*|*/*-credentials.*)
+        block "Secrets/credentials file pattern. Do not write secret material from an agent. Ask the user to edit manually." ;;
 esac
 
 # Rule 3 — root-file policy.

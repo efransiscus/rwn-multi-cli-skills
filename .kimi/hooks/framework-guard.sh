@@ -4,10 +4,8 @@
 # .kimi/ is Kimi's own territory. .ai/ is shared with other CLIs
 # (allowed for orchestrator; subagent writes restricted per agent config).
 
-read JSON
-
 FILE_PATH=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
-            python -c  "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
+            python  -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
             echo "")
 
 [ -z "$FILE_PATH" ] && exit 0

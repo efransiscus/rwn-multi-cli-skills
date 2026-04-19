@@ -2,10 +2,8 @@
 # Hook 4: Destructive command guard
 # Block dangerous shell commands
 
-read JSON
-
 COMMAND=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null || \
-          python -c  "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null || \
+          python  -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null || \
           echo "")
 
 [ -z "$COMMAND" ] && exit 0

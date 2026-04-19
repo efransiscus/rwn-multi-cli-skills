@@ -2,10 +2,8 @@
 # Hook 3: Sensitive file guard
 # Block writes to .env*, *.key, *.pem, id_rsa*, .aws/, .ssh/
 
-read JSON
-
 FILE_PATH=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
-            python -c  "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
+            python  -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
             echo "")
 
 [ -z "$FILE_PATH" ] && exit 0
@@ -16,6 +14,14 @@ BASENAME=$(basename "$FILE_PATH")
 case "$BASENAME" in
     .env*|*.env)
         echo "BLOCKED: Direct modification of .env files is not allowed. Use .env.example for templates." >&2
+        exit 2
+        ;;
+    secrets.*|*.secrets|*-secrets.*)
+        echo "BLOCKED: Writing to secrets files is not allowed: $FILE_PATH" >&2
+        exit 2
+        ;;
+    credentials|credentials.*|*-credentials.*)
+        echo "BLOCKED: Writing to credentials files is not allowed: $FILE_PATH" >&2
         exit 2
         ;;
 esac

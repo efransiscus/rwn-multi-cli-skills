@@ -7,13 +7,13 @@ invoked by `~/.kimi/config.toml`.
 
 | Hook | Event | Matcher | Script | Purpose |
 |------|-------|---------|--------|---------|
-| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | Block writes to project root except ADR Category A allowlist (AGENTS.md, README.md, CLAUDE.md, LICENSE, CHANGELOG, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .mcp.json) |
+| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | Block writes to project root except ADR-0001 allowlist: Category A (AGENTS.md, README.md, CLAUDE.md, LICENSE*, CHANGELOG*, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md) + Category B (.gitignore, .gitattributes) + Category C (.editorconfig) + Category D (.dockerignore, .gitlab-ci.yml) + Category E (.mcp.json, .mcp.json.example). See `docs/architecture/0001-root-file-exceptions.md` for the full allowlist. |
 | Framework dir guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `framework-guard.sh` | Block writes to `.claude/` and `.kiro/` (other CLIs' dirs) |
 | Sensitive file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `sensitive-guard.sh` | Block writes to `.env*`, `*.key`, `*.pem`, `id_rsa*`, `.aws/`, `.ssh/` |
 | Destructive cmd guard | `PreToolUse` | `Shell` | `destructive-guard.sh` | Block `rm -rf /`, `git push --force`, `git reset --hard`, `DROP TABLE/DATABASE` |
 | Git status at start | `SessionStart` | — | `git-status.sh` | Inject `git status --short` into context at session start |
 | Open handoffs reminder | `SessionStart` | — | `handoffs-remind.sh` | List `.ai/handoffs/to-kimi/open/*.md` if any |
-| Activity log inject | `UserPromptSubmit` | — | `activity-log-inject.sh` | Inject top 40 lines of `.ai/activity-log.md` into context |
+| Activity log inject | `UserPromptSubmit` | — | `activity-log-inject.sh` | Inject top 40 lines of `.ai/activity/log.md` into context |
 | Activity log remind | `Stop` | — | `activity-log-remind.sh` | Remind to update activity log if not touched in 60 min |
 | Git dirty reminder | `Stop` | — | `git-dirty-remind.sh` | Remind about uncommitted changes beyond activity log |
 
@@ -66,7 +66,8 @@ echo '{"tool_input": {"command": "rm -rf /"}}' | bash .kimi/hooks/destructive-gu
 2. Add a `[[hooks]]` entry in `~/.kimi/config.toml` (or
    `config/.kimi-config-template.toml` for the template).
 3. Test manually with piped JSON before relying on it.
-4. Update the table above.
+4. Run the standing regression suite: `bash test_hooks.sh` (expects `PASS: 16/16`).
+5. Update the table above.
 
 ## Windows note
 

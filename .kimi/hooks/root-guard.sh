@@ -3,10 +3,8 @@
 # Block writes to project root except files listed in ADR Category A
 # See docs/architecture/0001-root-file-exceptions.md for the full allowlist
 
-read JSON
-
 FILE_PATH=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
-            python -c  "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
+            python  -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || \
             echo "")
 
 # If we couldn't parse, fail open

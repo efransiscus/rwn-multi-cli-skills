@@ -45,6 +45,8 @@ Simulate the hook input from the shell. Claude Code passes tool-call context as 
 
 Check exit codes (`$?`) to verify block-vs-allow.
 
+For a full regression run, use `test_hooks.sh` — pipes curated JSON payloads through both pre-tool hooks and asserts the expected exit code. Run from repo root: `bash .claude/hooks/test_hooks.sh` (expects `PASS: 17/17`).
+
 ## JSON parsing
 
 Python is used for robust stdin JSON extraction since `jq` isn't reliably installed on Windows + Git Bash. The pattern is:
