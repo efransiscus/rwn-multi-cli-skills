@@ -40,11 +40,25 @@ Claude to update something in `.claude/` or in Claude's portion of the shared do
 
 ## Filename convention
 
-    NNN-short-task-slug.md
+    YYYYMMDDHHMM-short-task-slug.md
 
-- `NNN` — 3-digit sequence, per recipient. Next handoff to Kimi starts at `002-` if
-  `001-` already exists in either `open/` or `done/`.
+- `YYYYMMDDHHMM` — UTC timestamp of handoff creation, minute precision. Example:
+  `202604201530-wave5-cleanup.md` (2026-04-20 15:30 UTC). Collisions across CLIs
+  at the same minute are vanishingly rare; if one happens, the second writer
+  appends a `-a` / `-b` suffix.
 - `short-task-slug` — kebab-case, ≤ 5 words, describes the change.
+
+**Why timestamp-based (not `NNN-slug`):** the old `NNN` scheme required each
+CLI to compute `max(existing) + 1`, creating a race condition when two CLIs
+dispatched handoffs to the same recipient within seconds of each other. We
+observed 3 such collisions during the 2026-04-18/19 audit cycle. Timestamps
+are monotonic per-CLI-clock and carry useful metadata (when was this filed?)
+for free.
+
+**Legacy handoffs** (created before 2026-04-20) use the old `NNN-slug` format.
+Do not rename — they are grandfathered. New handoffs use the timestamp format.
+Sorting `ls .ai/handoffs/to-<cli>/open/` still shows oldest-first with both
+formats present.
 
 ## Protocol (lifecycle of a single handoff)
 

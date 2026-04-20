@@ -4,6 +4,13 @@ Sender: <claude-code | kimi-cli | kiro-cli>
 Recipient: <claude-code | kimi-cli | kiro-cli>
 Created: YYYY-MM-DD HH:MM
 
+<!--
+Filename: YYYYMMDDHHMM-<slug>.md (UTC, minute precision).
+Example: 202604201530-wave5-cleanup.md
+Legacy NNN-slug.md format is grandfathered; new handoffs use timestamp format.
+-->
+
+
 ## Goal
 <One sentence — what changes and why it matters.>
 

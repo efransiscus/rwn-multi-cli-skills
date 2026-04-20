@@ -63,11 +63,22 @@ echo '{"tool_input": {"command": "rm -rf /"}}' | bash .kimi/hooks/destructive-gu
 
 1. Write a script in this directory following the stdin-JSON → exit-code
    pattern.
-2. Add a `[[hooks]]` entry in `~/.kimi/config.toml` (or
-   `config/.kimi-config-template.toml` for the template).
+2. Add a `[[hooks]]` entry in `~/.kimi/config.toml`.
 3. Test manually with piped JSON before relying on it.
-4. Run the standing regression suite: `bash test_hooks.sh` (expects `PASS: 16/16`).
+4. Run the standing regression suite: `bash test_hooks.sh` (expects `PASS: 18/18`).
 5. Update the table above.
+
+## Wiring the guard hooks into Kimi CLI
+
+The 4 guard scripts in this directory (`root-guard.sh`, `framework-guard.sh`,
+`sensitive-guard.sh`, `destructive-guard.sh`) are **not active until they are
+registered** in `~/.kimi/config.toml`.
+
+A paste-ready snippet lives at `.ai/config-snippets/kimi-hooks.toml`. Append
+its contents to `~/.kimi/config.toml` and restart Kimi Code CLI (or start a
+fresh session) to enable the guards. The snippet includes comments on
+Windows-path handling and coexistence with the existing `safety-check.ps1`
+hook.
 
 ## Windows note
 
