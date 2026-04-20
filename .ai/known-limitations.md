@@ -54,8 +54,7 @@ runtime fix is the only hard guarantee.
 
 ## Kimi CLI — bash guards not wired into global config
 
-**Status:** Characterized 2026-04-19 22:30 by kimi-cli (handoff 031).
-Different failure mode than Kiro — **easier to fix**.
+**Status:** Characterized 2026-04-19 22:30 by kimi-cli (handoff 031). Snippet created 2026-04-19 23:30 (handoff 032). **Awaiting user paste.**
 
 **What:** Kimi's 4 bash guard scripts (`.kimi/hooks/root-guard.sh`,
 `framework-guard.sh`, `sensitive-guard.sh`, `destructive-guard.sh`) exist and
@@ -72,13 +71,9 @@ Hooks in Kimi are *global* (`[[hooks]]` array in `~/.kimi/config.toml`), not
 per-agent. One config edit wires them for root agent + subagents + every
 session. No Wave 4c equivalent needed.
 
-**Fix path:** user must paste a config.toml snippet to wire the 4 guards.
-Kimi cannot self-modify the global config (security boundary). Snippet
-available in `.ai/config-snippets/kimi-hooks.toml` (pending).
+**Fix path:** user must append the snippet from `.ai/config-snippets/kimi-hooks.toml` to `~/.kimi/config.toml`, then restart Kimi Code CLI. Kimi cannot self-modify the global config (security boundary). Snippet is validated and ready — 4 `[[hooks]]` blocks (PreToolUse × 3 fs_write guards + Shell matcher for destructive-guard).
 
-**Residual risk until fix:** Kimi agents (root + subagents) have ZERO hook
-enforcement today. Rely on tool-level `allowedPaths` / `deniedPaths` and
-prompt discipline only.
+**Residual risk until fix:** the 4 project bash guards are inactive. `safety-check.ps1` (PowerShell) remains active but has unaudited scope — may overlap with `destructive-guard.sh`. Full ADR-0001 + sensitive-file + destructive-cmd enforcement requires the bash guards to be wired.
 
 **Cross-CLI insight:** Kimi exposes `SubagentStart`/`SubagentStop` hook
 events that Claude/Kiro may not have. Could inject safety rules at subagent
