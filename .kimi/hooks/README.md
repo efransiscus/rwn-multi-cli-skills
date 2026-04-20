@@ -5,17 +5,18 @@ invoked by `~/.kimi/config.toml`.
 
 ## Hook inventory
 
-| Hook | Event | Matcher | Script | Purpose |
-|------|-------|---------|--------|---------|
-| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | Block writes to project root except ADR-0001 allowlist: Category A (AGENTS.md, README.md, CLAUDE.md, LICENSE*, CHANGELOG*, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md) + Category B (.gitignore, .gitattributes) + Category C (.editorconfig) + Category D (.dockerignore, .gitlab-ci.yml) + Category E (.mcp.json, .mcp.json.example). See `docs/architecture/0001-root-file-exceptions.md` for the full allowlist. |
-| Framework dir guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `framework-guard.sh` | Block writes to `.claude/` and `.kiro/` (other CLIs' dirs) |
-| Sensitive file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `sensitive-guard.sh` | Block writes to `.env*`, `*.key`, `*.pem`, `id_rsa*`, `.aws/`, `.ssh/` |
-| Destructive cmd guard | `PreToolUse` | `Shell` | `destructive-guard.sh` | Block `rm -rf /`, `git push --force`, `git reset --hard`, `DROP TABLE/DATABASE` |
-| Git status at start | `SessionStart` | — | `git-status.sh` | Inject `git status --short` into context at session start |
-| Open handoffs reminder | `SessionStart` | — | `handoffs-remind.sh` | List `.ai/handoffs/to-kimi/open/*.md` if any |
-| Activity log inject | `UserPromptSubmit` | — | `activity-log-inject.sh` | Inject top 40 lines of `.ai/activity/log.md` into context |
-| Activity log remind | `Stop` | — | `activity-log-remind.sh` | Remind to update activity log if not touched in 60 min |
-| Git dirty reminder | `Stop` | — | `git-dirty-remind.sh` | Remind about uncommitted changes beyond activity log |
+| Hook | Event | Matcher | Script | Status | Purpose |
+|------|-------|---------|--------|--------|---------|
+| Root file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `root-guard.sh` | ✅ **WIRED** | Block writes to project root except ADR-0001 allowlist: Category A (AGENTS.md, README.md, CLAUDE.md, LICENSE*, CHANGELOG*, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md) + Category B (.gitignore, .gitattributes) + Category C (.editorconfig) + Category D (.dockerignore, .gitlab-ci.yml) + Category E (.mcp.json, .mcp.json.example). See `docs/architecture/0001-root-file-exceptions.md` for the full allowlist. |
+| Framework dir guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `framework-guard.sh` | ✅ **WIRED** | Block writes to `.claude/` and `.kiro/` (other CLIs' dirs) |
+| Sensitive file guard | `PreToolUse` | `WriteFile\|StrReplaceFile` | `sensitive-guard.sh` | ✅ **WIRED** | Block writes to `.env*`, `*.key`, `*.pem`, `id_rsa*`, `.aws/`, `.ssh/` |
+| Destructive cmd guard | `PreToolUse` | `Shell` | `destructive-guard.sh` | ✅ **WIRED** | Block `rm -rf /`, `git push --force`, `git reset --hard`, `DROP TABLE/DATABASE` |
+| safety-check.ps1 | `PreToolUse` | `Shell` | `safety-check.ps1` | ✅ **WIRED** | Broad PowerShell safety net (blocks dangerous patterns) |
+| Git status at start | `SessionStart` | — | `git-status.sh` | ⚠️ **NOT WIRED** | Inject `git status --short` into context at session start |
+| Open handoffs reminder | `SessionStart` | — | `handoffs-remind.sh` | ⚠️ **NOT WIRED** | List `.ai/handoffs/to-kimi/open/*.md` if any |
+| Activity log inject | `UserPromptSubmit` | — | `activity-log-inject.sh` | ⚠️ **NOT WIRED** | Inject top 40 lines of `.ai/activity/log.md` into context |
+| Activity log remind | `Stop` | — | `activity-log-remind.sh` | ⚠️ **NOT WIRED** | Remind to update activity log if not touched in 60 min |
+| Git dirty reminder | `Stop` | — | `git-dirty-remind.sh` | ⚠️ **NOT WIRED** | Remind about uncommitted changes beyond activity log |
 
 ## How hooks work
 
@@ -68,17 +69,18 @@ echo '{"tool_input": {"command": "rm -rf /"}}' | bash .kimi/hooks/destructive-gu
 4. Run the standing regression suite: `bash test_hooks.sh` (expects `PASS: 18/18`).
 5. Update the table above.
 
-## Wiring the guard hooks into Kimi CLI
+## Wiring status
 
-The 4 guard scripts in this directory (`root-guard.sh`, `framework-guard.sh`,
-`sensitive-guard.sh`, `destructive-guard.sh`) are **not active until they are
-registered** in `~/.kimi/config.toml`.
+The 4 guard scripts (`root-guard.sh`, `framework-guard.sh`, `sensitive-guard.sh`,
+`destructive-guard.sh`) were wired into `~/.kimi/config.toml` on 2026-04-20.
+They are now active alongside the existing `safety-check.ps1` hook.
 
-A paste-ready snippet lives at `.ai/config-snippets/kimi-hooks.toml`. Append
-its contents to `~/.kimi/config.toml` and restart Kimi Code CLI (or start a
-fresh session) to enable the guards. The snippet includes comments on
-Windows-path handling and coexistence with the existing `safety-check.ps1`
-hook.
+**To finish activation:** restart Kimi Code CLI or start a fresh session.
+
+The 5 convenience hooks (`git-status.sh`, `handoffs-remind.sh`,
+`activity-log-inject.sh`, `activity-log-remind.sh`, `git-dirty-remind.sh`)
+remain on disk but are **not yet wired**. Add `[[hooks]]` entries to
+`~/.kimi/config.toml` manually if you want them.
 
 ## Windows note
 

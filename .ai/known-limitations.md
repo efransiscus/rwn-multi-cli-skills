@@ -52,28 +52,36 @@ runtime fix is the only hard guarantee.
 
 ---
 
-## Kimi CLI — bash guards not wired into global config
+## Kimi CLI — bash guards wired into global config
 
-**Status:** Characterized 2026-04-19 22:30 by kimi-cli (handoff 031). Snippet created 2026-04-19 23:30 (handoff 032). **Awaiting user paste.**
+**Status:** Characterized 2026-04-19 22:30 by kimi-cli (handoff 031). Snippet created 2026-04-19 23:30 (handoff 032). **Pasted and wired 2026-04-20.**
 
 **What:** Kimi's 4 bash guard scripts (`.kimi/hooks/root-guard.sh`,
-`framework-guard.sh`, `sensitive-guard.sh`, `destructive-guard.sh`) exist and
-pass pipe-tests, but they're NOT registered as active hooks in
-`~/.kimi/config.toml` (Kimi's global user-scope config). When an agent runs
-`fs_write` or `execute_bash`, NO guard fires because no guard is registered.
+`framework-guard.sh`, `sensitive-guard.sh`, `destructive-guard.sh`) exist,
+pass pipe-tests, and are **now registered as active hooks** in
+`~/.kimi/config.toml`. They fire alongside the existing `safety-check.ps1`
+hook (PowerShell) in parallel — if either exits 2, the operation is blocked.
 
-**Only hook currently active:** `safety-check.ps1` (PowerShell). Scope and
-coverage of this hook is not fully audited — may overlap with
-`destructive-guard.sh`.
+**Also active:** `safety-check.ps1` (PowerShell). Scope and coverage of this
+hook is not fully audited — may overlap with `destructive-guard.sh`.
 
 **Good news — Kimi architecture is simpler than Kiro:**
 Hooks in Kimi are *global* (`[[hooks]]` array in `~/.kimi/config.toml`), not
 per-agent. One config edit wires them for root agent + subagents + every
 session. No Wave 4c equivalent needed.
 
-**Fix path:** user must append the snippet from `.ai/config-snippets/kimi-hooks.toml` to `~/.kimi/config.toml`, then restart Kimi Code CLI. Kimi cannot self-modify the global config (security boundary). Snippet is validated and ready — 4 `[[hooks]]` blocks (PreToolUse × 3 fs_write guards + Shell matcher for destructive-guard).
+**Activation step:** restart Kimi Code CLI (or start a fresh session) to pick
+up the newly appended `[[hooks]]` blocks.
 
-**Residual risk until fix:** the 4 project bash guards are inactive. `safety-check.ps1` (PowerShell) remains active but has unaudited scope — may overlap with `destructive-guard.sh`. Full ADR-0001 + sensitive-file + destructive-cmd enforcement requires the bash guards to be wired.
+**Residual unwired hooks:** five convenience hooks exist on disk but are **not**
+registered in `~/.kimi/config.toml`:
+- `git-status.sh` (SessionStart)
+- `handoffs-remind.sh` (SessionStart)
+- `activity-log-inject.sh` (UserPromptSubmit)
+- `activity-log-remind.sh` (Stop)
+- `git-dirty-remind.sh` (Stop)
+
+These are optional — wire them manually if desired.
 
 **Cross-CLI insight:** Kimi exposes `SubagentStart`/`SubagentStop` hook
 events that Claude/Kiro may not have. Could inject safety rules at subagent
