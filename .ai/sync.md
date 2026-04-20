@@ -83,7 +83,26 @@ Copy-Item .ai/instructions/agent-catalog/principles.md .kiro/steering/agent-cata
    followed by the `principles.md` body. The `description` field matters — it determines
    when Claude auto-activates the skill.
 
-## Project-agnostic install (use this framework in another project)
+## Using the installer (recommended)
+
+For installing this framework into an existing project, use the bash installer:
+
+```bash
+# Dry-run first
+bash scripts/install-template.sh /path/to/target --dry-run
+# Then real
+bash scripts/install-template.sh /path/to/target
+```
+
+It handles the copy, sanitizes template state, merges `.gitignore`, detects
+language and amends ADR Category F, patches root-guard hooks, runs the full
+framework test suite, and commits on branch `ai-template-install`. See
+`scripts/README.md` for details.
+
+The manual steps below are kept for reference (and PowerShell users), but are
+now legacy — the installer is the supported path.
+
+## Project-agnostic install (use this framework in another project) — legacy manual steps
 
 ### Bash / Git Bash / macOS / Linux
 
