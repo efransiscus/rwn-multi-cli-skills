@@ -75,3 +75,6 @@ id_ed25519*
 # ---- Platform-specific ----
 .gradle/
 .vs/
+
+# ---- MCP runtime cache (Playwright MCP server scratch dir) ----
+.playwright-mcp/
