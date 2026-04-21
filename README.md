@@ -39,6 +39,15 @@ This template solves each: shared `.ai/activity/log.md` for the audit trail; a `
 
 **Not yet ready for:** production systems with compliance requirements (needs RBAC, observability, immutable audit logs — all flagged in [`.ai/known-limitations.md`](./.ai/known-limitations.md)).
 
+## Grounded in Anthropic's 4Ds of AI Fluency
+
+[Anthropic's AI Fluency framework](https://aifluencyframework.org/) defines four competencies for effective human–AI collaboration — **Delegation, Description, Discernment, Diligence**. This template is an opinionated implementation of them applied to multi-agent coding:
+
+- **Delegation** — scoped 13-subagent roster per CLI with explicit write boundaries enforced at the tool layer.
+- **Description** — structured [handoff protocol](./.ai/handoffs/README.md) for cross-CLI work (paste-ready instruction files, not ad-hoc chat).
+- **Discernment** — [safety hooks](./.claude/hooks/) + [SSOT drift checker](./.ai/tools/check-ssot-drift.sh) + CI test suites as systematic quality gates.
+- **Diligence** — [append-only activity log](./.ai/activity/log.md) + [known-limitations doc](./.ai/known-limitations.md) for transparent, auditable collaboration.
+
 ## Quick start
 
 Two modes, two scripts. Pick one:
