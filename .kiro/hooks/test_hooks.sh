@@ -47,9 +47,16 @@ run_test "t11 block credentials.json" "$HOOKS_DIR/sensitive-file-guard.sh" '{"to
 # --- destructive-cmd-guard ---
 echo "destructive-cmd-guard:"
 run_test "t12 block rm -rf /"              "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf /"}}'              2
-run_test "t13 block DROP DATABASE (upper)" "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"DROP DATABASE foo"}}'     2
-run_test "t14 block Drop Database (mixed)" "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"Drop Database foo"}}'     2
-run_test "t15 allow git status"            "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"git status"}}'            0
+run_test "t13 allow rm -rf /tmp/foo"       "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf /tmp/foo"}}'       0
+run_test "t14 block rm -rf / (trailing sp)" "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf / "}}'            2
+run_test "t15 block rm -rf /;echo ok"      "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf /;echo ok"}}'      2
+run_test "t16 allow rm -rf /usr"           "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf /usr"}}'           0
+run_test "t17 allow rm -rf ~/foo"          "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf ~/foo"}}'          0
+run_test "t18 allow rm -rf *.log"          "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf *.log"}}'          0
+run_test "t19 allow rm -rf ./build"        "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"rm -rf ./build"}}'        0
+run_test "t20 block DROP DATABASE (upper)" "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"DROP DATABASE foo"}}'     2
+run_test "t21 block Drop Database (mixed)" "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"Drop Database foo"}}'     2
+run_test "t22 allow git status"            "$HOOKS_DIR/destructive-cmd-guard.sh" '{"tool_input":{"command":"git status"}}'            0
 
 # --- Summary ---
 echo ""
