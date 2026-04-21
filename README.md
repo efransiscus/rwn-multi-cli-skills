@@ -41,28 +41,42 @@ This template solves each: shared `.ai/activity/log.md` for the audit trail; a `
 
 ## Quick start
 
-### Option A — Use this as a new project
+Two modes, two scripts. Pick one:
+
+| Mode | Script | When |
+|---|---|---|
+| **(A) New project** | `scripts/new-project.sh <name>` | Greenfield — fresh directory, framework pre-installed, ready to code in. |
+| **(B) Existing project** | `scripts/install-template.sh <path>` | Adoption — bolt the framework onto a codebase you already have. |
+
+### Option A — New project (greenfield)
 
 ```bash
-# Clone, rename, start coding
-git clone https://github.com/efransiscus/rwn-multi-cli-skills.git my-project
-cd my-project
-rm -rf .git && git init          # start fresh history
-# Now write your project in src/, tests/, docs/, etc.
+# Clone the template once
+git clone https://github.com/efransiscus/rwn-multi-cli-skills.git /tmp/rwn-template
+
+# Create a fresh project with the framework installed
+cd ~/Code
+bash /tmp/rwn-template/scripts/new-project.sh my-project
+
+# Preview first with --dry-run
+bash /tmp/rwn-template/scripts/new-project.sh my-project --dry-run
 ```
 
-### Option B — Adopt the framework into an existing project
+This creates `my-project/` with `git init`, stub `README.md` + `.gitignore`,
+an initial commit, and the full framework installed on a safety branch. Pick
+your stack next (`npm init` / `cargo init` / `go mod init` / etc.).
+
+### Option B — Existing project (adoption)
 
 ```bash
 # Clone the template
 git clone https://github.com/efransiscus/rwn-multi-cli-skills.git /tmp/rwn-template
 
 # Run the installer against your existing project
-cd /tmp/rwn-template
-./scripts/install-template.sh /path/to/your/existing/project
+bash /tmp/rwn-template/scripts/install-template.sh /path/to/your/existing/project
 
 # Preview first with --dry-run
-./scripts/install-template.sh /path/to/your/project --dry-run
+bash /tmp/rwn-template/scripts/install-template.sh /path/to/your/project --dry-run
 ```
 
 The installer:
@@ -73,7 +87,7 @@ The installer:
 - Runs the test suites (hooks × 3 CLIs + SSOT drift check) to verify clean install
 - Commits on a safety branch so you can roll back easily
 
-See [`scripts/README.md`](./scripts/README.md) for details.
+See [`scripts/README.md`](./scripts/README.md) for details on both scripts.
 
 ### After install — wire Kimi's global hooks (one manual step)
 
