@@ -1,6 +1,6 @@
 """Generate the pre-filled GitHub issue URL for the project-level tracking issue.
 
-This is the in-repo tracking issue (efransiscus/rwn-multi-cli-skills) that the user
+This is the in-repo tracking issue (rwn34/rwn-multi-cli-skills) that the user
 closes once Kiro upstream fixes the subagent hook-inheritance bug. Separate from
 `gen-kiro-issue-url.py`, which targets the upstream Kiro repo.
 """
@@ -57,7 +57,7 @@ See `.ai/reports/kiro-bug-subagent-hook-inheritance.md` for the full upstream-bo
 """
 
 url = (
-    "https://github.com/efransiscus/rwn-multi-cli-skills/issues/new?title="
+    "https://github.com/rwn34/rwn-multi-cli-skills/issues/new?title="
     + quote(title)
     + "&body="
     + quote(body)

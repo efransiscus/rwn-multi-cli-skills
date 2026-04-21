@@ -52,7 +52,7 @@ Two modes, two scripts. Pick one:
 
 ```bash
 # Clone the template once
-git clone https://github.com/efransiscus/rwn-multi-cli-skills.git /tmp/rwn-template
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git /tmp/rwn-template
 
 # Create a fresh project with the framework installed
 cd ~/Code
@@ -70,7 +70,7 @@ your stack next (`npm init` / `cargo init` / `go mod init` / etc.).
 
 ```bash
 # Clone the template
-git clone https://github.com/efransiscus/rwn-multi-cli-skills.git /tmp/rwn-template
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git /tmp/rwn-template
 
 # Run the installer against your existing project
 bash /tmp/rwn-template/scripts/install-template.sh /path/to/your/existing/project
