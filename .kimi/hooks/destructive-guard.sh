@@ -12,24 +12,16 @@ COMMAND=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool
 CMD_LOWER=$(echo "$COMMAND" | tr '[:upper:]' '[:lower:]')
 
 # Check destructive patterns
-case "$CMD_LOWER" in
-    *"rm -rf /"*|*"rm -rf /*"*)
-        echo "BLOCKED: rm -rf / or rm -rf /* is extremely dangerous and not allowed." >&2
-        exit 2
-        ;;
-    *"rm -rf *"*)
-        echo "BLOCKED: rm -rf * is dangerous in the wrong directory. Use rm with explicit file list." >&2
-        exit 2
-        ;;
-    *"rm -rf ~"*)
-        echo "BLOCKED: rm -rf ~ destroys your home directory." >&2
-        exit 2
-        ;;
-    *"rm -rf ."*)
-        echo "BLOCKED: rm -rf . deletes the current directory." >&2
-        exit 2
-        ;;
-esac
+# Normalize whitespace
+NORM=$(echo "$CMD_LOWER" | tr -s ' \t' '  ')
+
+rm_flags='(-[rf]+|-r[[:space:]]+-f|-f[[:space:]]+-r|--recursive[[:space:]]+--force|--force[[:space:]]+--recursive)'
+rm_target='(/|~|\*|\.)'
+rm_tail='([[:space:]]|[;|&]|$)'
+if [[ " $NORM " =~ [[:space:]]rm[[:space:]]+${rm_flags}[[:space:]]+${rm_target}${rm_tail} ]]; then
+    echo "BLOCKED: rm -rf with a dangerous target (/, ~, *, .) is not allowed." >&2
+    exit 2
+fi
 
 # git push --force / -f / --force-with-lease
 if echo "$CMD_LOWER" | grep -qE 'git\s+push\s+.*(--force|-f|--force-with-lease)\b'; then

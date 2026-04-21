@@ -42,6 +42,14 @@ run_test "t12-dest-blocks-rmrf"    ".kimi/hooks/destructive-guard.sh" '{"tool_in
 run_test "t13-dest-blocks-drop"    ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"DROP DATABASE foo"}}'  2
 run_test "t14-dest-blocks-mixed"   ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"Drop Database foo"}}' 2
 run_test "t15-dest-allows-gitstatus" ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"git status"}}'     0
+run_test "t19-dest-blocks-rmrf-root"    ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf /"}}'          2
+run_test "t20-dest-allows-rmrf-tmp"     ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf /tmp/foo"}}'    0
+run_test "t21-dest-blocks-rmrf-trailsp" ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf / "}}'         2
+run_test "t22-dest-blocks-rmrf-semi"    ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf /;echo ok"}}'  2
+run_test "t23-dest-allows-rmrf-usr"     ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf /usr"}}'       0
+run_test "t24-dest-allows-rmrf-homefoo" ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf ~/foo"}}'      0
+run_test "t25-dest-allows-rmrf-glob"    ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf *.log"}}'      0
+run_test "t26-dest-allows-rmrf-dotbuild" ".kimi/hooks/destructive-guard.sh" '{"tool_input":{"command":"rm -rf ./build"}}'   0
 
 # --- stdin-drain regression (F-4) ---
 run_test "t16-empty-stdin"         ".kimi/hooks/root-guard.sh"      ""                                                     0
