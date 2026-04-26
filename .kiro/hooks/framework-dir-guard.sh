@@ -9,5 +9,7 @@ FILE_PATH=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('to
 case "$FILE_PATH" in
   .kimi/*|.kimi\\*) echo "BLOCKED: Edit-boundary rule — Kiro cannot write to .kimi/. Create a handoff to .ai/handoffs/to-kimi/open/ instead." >&2; exit 2 ;;
   .claude/*|.claude\\*) echo "BLOCKED: Edit-boundary rule — Kiro cannot write to .claude/. Create a handoff to .ai/handoffs/to-claude/open/ instead." >&2; exit 2 ;;
+  .codegraph/*|.codegraph\\*) echo "BLOCKED: Edit-boundary rule — Kiro cannot write to .codegraph/ (Claude's graph dir)." >&2; exit 2 ;;
+  .kimigraph/*|.kimigraph\\*) echo "BLOCKED: Edit-boundary rule — Kiro cannot write to .kimigraph/ (Kimi's graph dir)." >&2; exit 2 ;;
 esac
 exit 0
