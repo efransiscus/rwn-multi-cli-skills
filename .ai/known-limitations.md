@@ -84,6 +84,33 @@ reading the file). No data loss risk.
 
 ---
 
+## KiroGraph — `kirograph install` hangs on interactive prompts in non-TTY
+
+**Status:** Characterized 2026-04-26 by kiro-cli during Phase B Part A install.
+
+**What:** `kirograph install` issues interactive prompts for embeddings,
+architecture, and caveman-mode opt-ins. In non-TTY contexts (CI, non-interactive
+shells, agent runners) those prompts have nothing to read from stdin and hang
+indefinitely. MCP config and the 4 auto-sync hooks are written before the hang,
+so the install is partially usable.
+
+**Workaround:** run `kirograph init` first (non-interactive — writes config + DB),
+then `kirograph install` and accept that it'll hang after writing MCP/hooks —
+interrupt it and recreate `.kiro/steering/kirograph.md` manually if needed. This
+is the empirical sequence Kiro used during Phase B Part A.
+
+**Cosmetic note:** `package.json` shows version 0.11.0 but `kirograph --version`
+reports 0.1.0. Track but don't act.
+
+**Severity:** UX papercut, not a correctness issue. Functional install achievable
+via the workaround.
+
+**Tracking:** no upstream issue filed yet — kirograph repo is
+`https://github.com/davide-desio-eleva/kirograph`. If we hit this again on a real
+adoption, file upstream.
+
+---
+
 ## Kimi CLI — bash guards wired into global config
 
 **Status:** Characterized 2026-04-19 22:30 by kimi-cli (handoff 031). Snippet created 2026-04-19 23:30 (handoff 032). **Pasted and wired 2026-04-20.**

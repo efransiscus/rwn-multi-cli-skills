@@ -1,0 +1,11 @@
+export const VERSION = '0.0.1';
+export { inspect } from './inspector/index.js';
+export type * from './inspector/types.js';
+export { classifyDirs } from './inspector/index.js';
+export type { DirClassification } from './inspector/index.js';
+export { computeDefaults, logDecisions } from './strategy/index.js';
+export type * from './strategy/types.js';
+export { planMigration, executePlan } from './migration/index.js';
+export type * from './migration/types.js';
+export { generateProjectContext, applyPatches } from './patcher/index.js';
+export type * from './patcher/types.js';

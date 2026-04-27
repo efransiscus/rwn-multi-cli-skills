@@ -1,0 +1,3 @@
+[package]
+name = "cli"
+version.workspace = true

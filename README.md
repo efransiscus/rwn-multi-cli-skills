@@ -183,6 +183,20 @@ Shared instruction content (orchestrator rules, agent catalog, coding guidelines
 
 Filenames use UTC timestamps: `YYYYMMDDHHMM-slug.md` (e.g., `202604201530-add-auth-endpoint.md`). This avoids the race condition that `NNN-slug.md` creates when two CLIs dispatch handoffs in the same second. Legacy `NNN-slug.md` handoffs are grandfathered.
 
+## Code knowledge graphs (optional)
+
+Each CLI has its own optional local code-knowledge-graph tool — **CodeGraph** (Claude), **KimiGraph** (Kimi), **KiroGraph** (Kiro). All three share the same architecture (tree-sitter parser → SQLite index → MCP server) and drop typical exploration from 10+ file reads to a single graph query. All three are **optional** — the framework works fine without them.
+
+| CLI | Tool | Install command |
+|---|---|---|
+| Claude | CodeGraph | `npx @colbymchenry/codegraph` |
+| Kimi | KimiGraph | `npm install -g rwn-kimigraph` then `kimigraph install` |
+| Kiro | KiroGraph | source-build from `https://github.com/davide-desio-eleva/kirograph` (no npm release yet — see plan for steps) |
+
+Write boundaries: each CLI can only write to its own graph dir (`.codegraph/`, `.kimigraph/`, `.kirograph/`); cross-graph writes are blocked by the existing pretool hook. At adoption these are structural-only (no embeddings); semantic similarity can be enabled later via each tool's own opt-in config.
+
+See [.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md](./.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md) for the full rationale and per-tool tradeoffs.
+
 ## Directory map
 
 ```
@@ -302,6 +316,7 @@ This template is actively maintained. Expect iteration, expect some things to mo
 - [`.ai/instructions/orchestrator-pattern/principles.md`](./.ai/instructions/orchestrator-pattern/principles.md) — Delegation architecture
 - [`.ai/instructions/agent-catalog/principles.md`](./.ai/instructions/agent-catalog/principles.md) — 13-agent roster
 - [`scripts/README.md`](./scripts/README.md) — Install script details
+- [`.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md`](./.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md) — Code-graph adoption plan (CodeGraph/KimiGraph/KiroGraph)
 
 ## License
 

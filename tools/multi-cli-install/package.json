@@ -1,0 +1,23 @@
+{
+  "name": "@rwn34/multi-cli-install",
+  "version": "0.0.1",
+  "description": "Single-command installer for the multi-CLI AI coordination framework",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "multi-cli-install": "dist/bin/multi-cli-install.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.8",
+    "vitest": "^3.2"
+  }
+}
