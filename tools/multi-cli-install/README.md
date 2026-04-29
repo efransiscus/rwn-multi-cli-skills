@@ -6,19 +6,33 @@ Inspects your project, reorganizes files into the framework's canonical layout w
 
 ## Usage
 
+Build locally first (not yet published to npm):
+
 ```bash
-# Existing project — inspect, reorganize, install framework
-npx @rwn34/multi-cli-install /path/to/project
-
-# Preview only (no changes)
-npx @rwn34/multi-cli-install /path/to/project --dry-run
-
-# Inspect only (show profile as JSON)
-npx @rwn34/multi-cli-install /path/to/project --inspect-only
-
-# Refresh context file only (re-run inspector, regenerate .ai/project-context.md)
-npx @rwn34/multi-cli-install /path/to/project --refresh-context
+cd tools/multi-cli-install
+npm install && npm run build
 ```
+
+Five invocation modes:
+
+```bash
+# 1. Inspect only — read-only, dump detected profile as JSON
+node bin/multi-cli-install.ts /path/to/project --inspect-only
+
+# 2. Dry-run — read-only, show full plan (framework copy + reorganize moves)
+node bin/multi-cli-install.ts /path/to/project --dry-run
+
+# 3. Greenfield — create a new project with the framework
+node bin/multi-cli-install.ts my-new-project --new
+
+# 4. Existing-project install — copy framework + reorganize layout
+node bin/multi-cli-install.ts /path/to/existing/project
+
+# 5. Refresh context — regenerate .ai/project-context.md only
+node bin/multi-cli-install.ts /path/to/project --refresh-context
+```
+
+Design context: [`.ai/research/multi-cli-install-v2-plan.md`](../../.ai/research/multi-cli-install-v2-plan.md).
 
 ## What it does
 
@@ -54,6 +68,7 @@ cd tools/multi-cli-install
 npm install
 npm run build
 npm test
+npm run lint
 ```
 
 ## Status
