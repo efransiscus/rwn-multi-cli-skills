@@ -1,4 +1,4 @@
-export const VERSION = '0.0.1';
+export const VERSION = '0.0.2';
 export { inspect } from './inspector/index.js';
 export type * from './inspector/types.js';
 export { classifyDirs } from './inspector/index.js';
