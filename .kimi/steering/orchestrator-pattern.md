@@ -58,6 +58,11 @@ of native config so each CLI manages its own conventions.
 7. If no existing subagent fits the task, describe what's needed (tools, skills,
    purpose) and ask the user to approve creating a new agent.
 
+**Project context** — at the start of substantive work, read
+`.ai/project-context.md` if it exists. It captures this project's stack, layout,
+and commands as of the most recent install or refresh. If the project has evolved
+since, run `npx @rwn34/multi-cli-install --refresh-context`.
+
 ### Subagents
 
 Twelve specialized subagents handle all project mutations — `coder`, `reviewer`,
