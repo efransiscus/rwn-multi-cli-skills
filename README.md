@@ -50,12 +50,13 @@ This template solves each: shared `.ai/activity/log.md` for the audit trail; a `
 
 ## Quick start
 
-Two modes, two scripts. Pick one:
+Three install paths. The bash scripts (A, B) are battle-tested. The Node.js installer (C) is pre-release and adds project inspection + layout reorganization.
 
-| Mode | Script | When |
+| Mode | Path | When |
 |---|---|---|
-| **(A) New project** | `scripts/new-project.sh <name>` | Greenfield — fresh directory, framework pre-installed, ready to code in. |
-| **(B) Existing project** | `scripts/install-template.sh <path>` | Adoption — bolt the framework onto a codebase you already have. |
+| **(A) New project** | `scripts/new-project.sh <name>` | Greenfield — fresh directory, framework pre-installed, ready to code in. Bash, proven. |
+| **(B) Existing project** | `scripts/install-template.sh <path>` | Adoption — bolt the framework onto a codebase you already have. Bash, proven. |
+| **(C) Node.js installer (pre-release)** | `node tools/multi-cli-install/bin/multi-cli-install.ts <target>` | Greenfield OR adoption with optional layout reorganization. v0.0.1, fixture-only validated. |
 
 ### Option A — New project (greenfield)
 
@@ -107,10 +108,36 @@ See [`scripts/README.md`](./scripts/README.md) for details on both scripts.
 cd tools/multi-cli-install
 npm install && npm run build
 
-# Use against a target
-node bin/multi-cli-install.ts /path/to/project --dry-run    # preview
-node bin/multi-cli-install.ts my-new-project --new          # greenfield
+# Five invocation modes:
+
+# 1. Inspect only — read-only, shows what the binary detects (always safe)
+node bin/multi-cli-install.ts /path/to/project --inspect-only
+
+# 2. Dry-run — read-only, shows the full plan (framework copy + reorganize moves)
+node bin/multi-cli-install.ts /path/to/project --dry-run
+
+# 3. Greenfield — create a new project with the framework
+node bin/multi-cli-install.ts my-new-project --new
+
+# 4. Existing-project install — copies framework + reorganizes layout
+node bin/multi-cli-install.ts /path/to/existing/project
+
+# 5. Refresh context — regenerates .ai/project-context.md only
+node bin/multi-cli-install.ts /path/to/project --refresh-context
 ```
+
+**First-run safety:** Before mode 4 against a real codebase, run mode 1 then mode 2 to preview. The installer refuses to write if the target's git tree is dirty, so you can always `git reset --hard` after a failed run.
+
+### Which option to use
+
+| Situation | Recommended option |
+|---|---|
+| New project (greenfield) | **A** (proven) — or C `--new` if you want the newer pipeline |
+| Existing project, framework adoption only | **B** (proven, canonical) |
+| Existing project, want layout reorganized into the framework's canonical structure | **C** — but always run `--inspect-only` then `--dry-run` first; only `npm test` afterwards |
+| Just exploring what the installer thinks of your repo | **C** `--inspect-only` (read-only, always safe) |
+
+The bash path will stay canonical until the Node.js installer reaches v1.0.0 with at least one real-project validation. See [`.ai/known-limitations.md`](./.ai/known-limitations.md).
 
 ### After install — wire Kimi's global hooks (one manual step)
 
