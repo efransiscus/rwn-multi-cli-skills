@@ -48,9 +48,32 @@ This template solves each: shared `.ai/activity/log.md` for the audit trail; a `
 - **Discernment** — [safety hooks](./.claude/hooks/) + [SSOT drift checker](./.ai/tools/check-ssot-drift.sh) + CI test suites as systematic quality gates.
 - **Diligence** — [append-only activity log](./.ai/activity/log.md) + [known-limitations doc](./.ai/known-limitations.md) for transparent, auditable collaboration.
 
+## Prerequisites
+
+Before running any install path, verify these:
+
+- **Git installed.** `git --version` should print a version. Fresh installs of git default new repos to `main` (not `master`) since 2020 — keep that in mind for the Phase 6 follow-up below.
+- **Git user configured globally.** The installer makes a commit; without global identity, git aborts with `fatal: unable to auto-detect email address`. Run once:
+  ```
+  git config --global user.email "you@example.com"
+  git config --global user.name  "Your Name"
+  ```
+- **Bash available.** Linux/macOS: any system bash works. **Windows: prefer Git Bash** (`C:\Program Files\Git\bin\bash.exe`) over WSL bash. The two use different path conventions (Git Bash: `/c/Users/...`, WSL: `/mnt/c/Users/...`) and the installer's path resolution assumes Git Bash style on Windows.
+- **Clean working tree** (Option B / adoption only). The installer refuses to run if `git status` is dirty. Commit or `git stash` first.
+
 ## Quick start
 
 Three install paths. The bash scripts (A, B) are battle-tested. The Node.js installer (C) is pre-release and adds project inspection + layout reorganization.
+
+### Windows users — read this first
+
+- Use the **Git Bash** terminal (Start menu → "Git Bash") for the simplest experience. Every bash example below works there as written.
+- **Do NOT paste bash multi-line blocks into PowerShell.** Backslash continuations and `#` comments don't translate; lines get parsed independently and you can end up running an unintended `git init` in the wrong directory. If you must use PowerShell, use the **Windows PowerShell** variants provided under each option.
+- **`bash` on a Windows PATH may resolve to WSL bash**, not Git Bash. WSL bash uses `/mnt/c/Users/...`; if you hit "No such file or directory" with `/c/Users/...` paths even though `Test-Path` returns `True`, that's the cause. Either launch the Git Bash terminal directly, or invoke its binary explicitly from PowerShell:
+  ```powershell
+  & "C:\Program Files\Git\bin\bash.exe" "<script-path>" "<args>"
+  ```
+- **Default branch is `main`, not `master`** on freshly-initialized repos. If a follow-up step says `git checkout master` and your branch is `main`, substitute.
 
 | Mode | Path | When |
 |---|---|---|
@@ -60,16 +83,28 @@ Three install paths. The bash scripts (A, B) are battle-tested. The Node.js inst
 
 ### Option A — New project (greenfield)
 
+**Linux / macOS / Git Bash:**
+
 ```bash
 # Clone the template once
-git clone https://github.com/rwn34/rwn-multi-cli-skills.git /tmp/rwn-template
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git ~/rwn-template
 
 # Create a fresh project with the framework installed
 cd ~/Code
-bash /tmp/rwn-template/scripts/new-project.sh my-project
+bash ~/rwn-template/scripts/new-project.sh my-project
 
 # Preview first with --dry-run
-bash /tmp/rwn-template/scripts/new-project.sh my-project --dry-run
+bash ~/rwn-template/scripts/new-project.sh my-project --dry-run
+```
+
+**Windows PowerShell:**
+
+```powershell
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git C:\Users\<you>\rwn-template
+cd C:\Users\<you>\Code
+& "C:\Program Files\Git\bin\bash.exe" "C:\Users\<you>\rwn-template\scripts\new-project.sh" "my-project"
+# Preview first:
+& "C:\Program Files\Git\bin\bash.exe" "C:\Users\<you>\rwn-template\scripts\new-project.sh" "my-project" "--dry-run"
 ```
 
 This creates `my-project/` with `git init`, stub `README.md` + `.gitignore`,
@@ -78,15 +113,31 @@ your stack next (`npm init` / `cargo init` / `go mod init` / etc.).
 
 ### Option B — Existing project (adoption)
 
+**Linux / macOS / Git Bash:**
+
 ```bash
 # Clone the template
-git clone https://github.com/rwn34/rwn-multi-cli-skills.git /tmp/rwn-template
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git ~/rwn-template
+
+# Make sure your target's working tree is clean first
+cd /path/to/your/existing/project && git status
 
 # Run the installer against your existing project
-bash /tmp/rwn-template/scripts/install-template.sh /path/to/your/existing/project
+bash ~/rwn-template/scripts/install-template.sh /path/to/your/existing/project
 
 # Preview first with --dry-run
-bash /tmp/rwn-template/scripts/install-template.sh /path/to/your/project --dry-run
+bash ~/rwn-template/scripts/install-template.sh /path/to/your/existing/project --dry-run
+```
+
+**Windows PowerShell:**
+
+```powershell
+git clone https://github.com/rwn34/rwn-multi-cli-skills.git C:\Users\<you>\rwn-template
+cd C:\path\to\your\existing\project
+git status   # must be clean; if not, commit or stash first
+& "C:\Program Files\Git\bin\bash.exe" "C:\Users\<you>\rwn-template\scripts\install-template.sh" "."
+# Preview first:
+& "C:\Program Files\Git\bin\bash.exe" "C:\Users\<you>\rwn-template\scripts\install-template.sh" "." "--dry-run"
 ```
 
 The installer:
@@ -139,15 +190,86 @@ node bin/multi-cli-install.ts /path/to/project --refresh-context
 
 The bash path will stay canonical until the Node.js installer reaches v1.0.0 with at least one real-project validation. See [`.ai/known-limitations.md`](./.ai/known-limitations.md).
 
-### After install — wire Kimi's global hooks (one manual step)
+### After install — merge the install branch
 
-Kimi reads hooks from `~/.kimi/config.toml`. Append the generated snippet:
+The installer leaves you on the `ai-template-install` branch with one commit. Merge it into your default branch (modern git: `main`; older repos: `master`):
 
 ```bash
+# Pick whichever is your default branch
+git checkout main   # or: git checkout master
+git merge --no-ff ai-template-install
+```
+
+### After install — wire Kimi's global hooks (one manual step)
+
+Kimi reads hooks from `~/.kimi/config.toml` (user-global, not per-project). Append the generated snippet.
+
+**Linux / macOS / Git Bash:**
+
+```bash
+mkdir -p ~/.kimi
 cat .ai/config-snippets/kimi-hooks.toml >> ~/.kimi/config.toml
 ```
 
+**Windows PowerShell:**
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\.kimi" | Out-Null
+Get-Content ".\.ai\config-snippets\kimi-hooks.toml" | Add-Content "$HOME\.kimi\config.toml"
+```
+
 Restart Kimi. You're done.
+
+## Troubleshooting
+
+Common errors and the fastest fix.
+
+### `fatal: destination path '.../rwn-template' already exists`
+
+Leftover from a prior attempt. Either delete the dir or clone elsewhere.
+
+```bash
+rm -rf ~/rwn-template                                    # Linux/macOS/Git Bash
+```
+```powershell
+Remove-Item C:\Users\<you>\rwn-template -Recurse -Force  # PowerShell
+```
+
+### `fatal: unable to auto-detect email address`
+
+Git's global identity isn't set; the installer's commit step fails. Run the two `git config --global` commands from [Prerequisites](#prerequisites) and re-run.
+
+### `/bin/bash: <path>: No such file or directory` (but `Test-Path` returns `True`)
+
+You're invoking WSL bash, which doesn't see Windows paths the same way. Either launch the **Git Bash terminal** directly, or call its binary explicitly:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" "<your-script-path>" "<args>"
+```
+
+### `error: pathspec 'master' did not match any file(s) known to git`
+
+Modern git defaults to `main`. Substitute: `git checkout main`. (Confirm with `git branch --show-current`.)
+
+### PowerShell ate my multi-line command
+
+Backslash continuations and `#`-comments inside a bash block don't survive PowerShell parsing — lines run independently and an accidental `git init` can pollute the wrong directory. Run each command on its own line, or save the block to `install.ps1` and execute:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+### `Target working tree is dirty. Commit or stash first.`
+
+The adoption installer refuses to run on an uncommitted tree. Run `git status`, then `git commit` or `git stash` your changes and retry.
+
+### `Permission denied` when running `scripts/install-template.sh`
+
+Linux/macOS only — the file lost its executable bit. Either invoke via `bash`, or restore the bit:
+
+```bash
+chmod +x scripts/install-template.sh
+```
 
 ## How it works
 
