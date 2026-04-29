@@ -17,6 +17,20 @@ See the AI contract in this project's CLI steering files (`CLAUDE.md`,
 
 ---
 
+## 2026-04-29 — claude-code (orchestrator)
+- Action: User asked whether the install instructions I summarized in chat were actually documented in `README.md`. Verified: README has Options A/B/C but only `--dry-run` + `--new` shown for Option C, intro table still says "Two modes, two scripts" despite Option C below it, no decision matrix. Delegated doc-writer to fix three gaps: (1) intro table refresh — "Three install paths" + row C added with proven/pre-release labels; (2) Option C code block expanded to all 5 invocation modes (`--inspect-only`, `--dry-run`, `--new`, default existing-project, `--refresh-context`) + first-run safety note (dirty-tree refusal + `git reset --hard` recovery); (3) new H3 "Which option to use" decision matrix between Option C and Kimi-hooks-wiring section. Doc-writer flagged unrelated parity drift — `tools/multi-cli-install/README.md` `## Usage` section still lists 4 invocations and omits `--new`. Not actioned this round (package README is its own canonical doc).
+- Files (delegated): `README.md` lines 51–59 (intro table), 102–129 (Option C expansion), 131–140 (new decision matrix H3).
+- Decisions: User multi-selected all 4 options including "Skip" — read intent as "do the 3 fixes, leave package README alone" (which the Skip option implied via constraint). Doc-writer respected the constraint. Did NOT trigger a new commit-and-push — small doc tweaks accumulating, will batch with the next substantive change rather than spam origin/master with single-doc commits. Did NOT bring `tools/multi-cli-install/README.md` to parity — surfacing as follow-up; package README has different audience (developers building locally) vs top-level README (adopters running install).
+
+---
+
+## 2026-04-29 — claude-code (orchestrator)
+- Action: Pushed the cycle's remaining work to GitHub via infra-engineer. Five topic commits landed on origin/master: `50c3704` feat(multi-cli-install) installer layer + B1–B4 fixes; `67b91ec` feat(orchestrator) point subagents at .ai/project-context.md; `1ed3f7e` docs v0.0.1 pre-release status + tradeoffs; `0a3d96e` chore(handoffs) close v2 implementation + remediation cycle; `4369947` chore(activity-log) cycle summary. Range `a305c4a..4369947`. Infra-engineer flagged that the bulk of the v0.0.1 scaffold + graph adoption + Kimi handoff was ALREADY in `a305c4a` from a prior session — actual delta this push was just remediation layer + SSOT touch + docs + handoff closures + log. No secrets, no binary DBs leaked, gitignores honored (`node_modules/`, `dist/`, `assets/`, code-graph DBs all excluded).
+- Files: 5 commits via infra-engineer (no orchestrator-direct file changes — log entry only).
+- Decisions: Did NOT split into the 9 commits originally specified — infra-engineer correctly collapsed to 5 because bulk was already on origin. Did NOT force-push, did NOT tag a release (v0.0.1 stays untagged in this repo per fixture-only validation reality). Did NOT trigger a release-engineer flow — that's reserved for actual npm publish, which is gated on real-project validation per the locked policy. End of cycle, this branch is shipped.
+
+---
+
 ## 2026-04-27 16:25 — claude-code (orchestrator)
 - Action: Triggered doc-writer pass to refresh stale top-level `README.md` items per user direction. (a) Status line refreshed: `pre-1.0 (last refreshed 2026-04-27)` plus bash-vs-Node.js install-path distinction. (b) Confidence assessment date refreshed 2026-04-20 → 2026-04-27, confidence split per install path (bash ~80%, Node.js ~50%, production ~55% path-agnostic). (c) New weakness item 7 added on Node.js installer pre-release status. (d) Directory map `tools/` entry now shows `multi-cli-install/` sub-entry with v0.0.1 pre-release annotation. Real-project validation explicitly parked — user will trigger when they have a project ready.
 - Files (delegated): `README.md` (4 small edits — line 5, lines 270-271, line 296, line 306).
