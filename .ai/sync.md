@@ -21,6 +21,9 @@ disagree, regenerate from here. Never edit the replicas directly.
 | `.ai/instructions/agent-catalog/principles.md` | `.claude/skills/agent-catalog/SKILL.md` (body only; Claude frontmatter stays) | Claude skill |
 | `.ai/instructions/agent-catalog/principles.md` | `.kimi/steering/agent-catalog.md` | Kimi steering |
 | `.ai/instructions/agent-catalog/principles.md` | `.kiro/steering/agent-catalog.md` | Kiro steering |
+| `.ai/instructions/code-graphs/principles.md` | `.claude/skills/code-graphs/SKILL.md` (body only; Claude frontmatter + provenance comment stay) | Claude skill |
+| `.ai/instructions/code-graphs/principles.md` | `.kimi/steering/code-graphs.md` | Kimi steering |
+| `.ai/instructions/code-graphs/principles.md` | `.kiro/steering/code-graphs.md` | Kiro steering |
 
 ## Copy commands
 
@@ -43,6 +46,11 @@ cp .ai/instructions/agent-catalog/principles.md .kimi/steering/agent-catalog.md
 cp .ai/instructions/agent-catalog/principles.md .kiro/steering/agent-catalog.md
 # Claude SKILL.md needs frontmatter — body-only replace.
 
+# code-graphs
+cp .ai/instructions/code-graphs/principles.md .kimi/steering/code-graphs.md
+cp .ai/instructions/code-graphs/principles.md .kiro/steering/code-graphs.md
+# Claude SKILL.md needs frontmatter — body-only replace.
+
 # Claude SKILL.md files need CLI-specific frontmatter + provenance comments —
 # do not blind-copy. Keep the existing frontmatter header, then replace the body
 # below the `<!-- SSOT: ... -->` line with the current contents of principles.md.
@@ -61,6 +69,9 @@ Copy-Item .ai/instructions/orchestrator-pattern/principles.md .kiro/steering/orc
 # agent-catalog
 Copy-Item .ai/instructions/agent-catalog/principles.md .kimi/steering/agent-catalog.md
 Copy-Item .ai/instructions/agent-catalog/principles.md .kiro/steering/agent-catalog.md
+# code-graphs
+Copy-Item .ai/instructions/code-graphs/principles.md .kimi/steering/code-graphs.md
+Copy-Item .ai/instructions/code-graphs/principles.md .kiro/steering/code-graphs.md
 # (Kiro SKILL.md has a frontmatter header and is regenerated manually — see .ai/cli-map.md)
 ```
 
