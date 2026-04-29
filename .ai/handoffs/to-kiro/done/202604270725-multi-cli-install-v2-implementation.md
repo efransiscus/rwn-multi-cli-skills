@@ -1,5 +1,5 @@
 # multi-cli-install v2 — implementation
-Status: IN-PROGRESS (P0–P5 complete. P6 redefined to fixture-only — execute and report)
+Status: BLOCKED on remediation (P0–P5 incomplete vs spec. See handoff `202604271400-multi-cli-install-v2-remediation.md`)
 Sender: claude-code (orchestrator)
 Recipient: kiro-cli
 Created: 2026-04-27 07:25
