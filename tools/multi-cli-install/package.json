@@ -7,7 +7,9 @@
   "bin": {
     "multi-cli-install": "dist/bin/multi-cli-install.js"
   },
+  "files": ["dist", "assets"],
   "scripts": {
+    "prebuild": "npx tsx scripts/sync-assets.ts",
     "build": "tsc",
     "test": "vitest run",
     "lint": "tsc --noEmit"
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@types/node": "^22",
+    "tsx": "^4.19",
     "typescript": "^5.8",
     "vitest": "^3.2"
   }

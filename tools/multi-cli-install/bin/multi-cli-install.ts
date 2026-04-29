@@ -1,7 +1,12 @@
 #!/usr/bin/env node
-import { VERSION, inspect, classifyDirs, computeDefaults, logDecisions, planMigration, executePlan, applyPatches } from '../src/index.js';
+import {
+  VERSION, inspect, classifyDirs, computeDefaults, logDecisions,
+  planMigration, executePlan, applyPatches,
+  scaffoldGreenfield, copyFrameworkFiles, resolveTemplateDir, sanitizeState, adaptPolicy,
+} from '../src/index.js';
+import { execSync } from 'node:child_process';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { resolve, join, basename } from 'node:path';
 
 const args = process.argv.slice(2);
 const flags = new Set(args.filter(a => a.startsWith('-')));
@@ -31,12 +36,36 @@ const targetDir = resolve(positional[0]);
 const dryRun = flags.has('--dry-run');
 const inspectOnly = flags.has('--inspect-only');
 const refreshContext = flags.has('--refresh-context');
+const isNew = flags.has('--new');
 
 async function main() {
   console.log(`multi-cli-install v${VERSION}`);
   console.log(`Target: ${targetDir}`);
   if (dryRun) console.log('Mode: dry-run (no changes will be written)');
   console.log('');
+
+  // Greenfield scaffold
+  if (isNew) {
+    const projectName = basename(targetDir);
+    console.log(`Creating new project: ${projectName}`);
+    scaffoldGreenfield(targetDir, projectName);
+    console.log('  ✓ Git repo initialized with initial commit');
+    console.log('');
+  }
+
+  // Refuse if target is dirty (skip for greenfield — always clean after scaffold)
+  if (!isNew && existsSync(join(targetDir, '.git'))) {
+    try {
+      const status = execSync('git status --porcelain', { cwd: targetDir, encoding: 'utf-8' });
+      if (status.trim().length > 0) {
+        console.error('Error: Target working tree is dirty. Commit or stash first.');
+        console.error(status);
+        process.exit(1);
+      }
+    } catch {
+      // Not a git repo or git not available — skip check
+    }
+  }
 
   // Step 1: Inspect
   console.log('Inspecting project...');
@@ -74,6 +103,26 @@ async function main() {
   }
   console.log('');
 
+  // Install framework (skip for inspect-only and refresh-context)
+  if (!inspectOnly && !refreshContext) {
+    const templateDir = resolveTemplateDir();
+
+    console.log('Copying framework files...');
+    const copied = copyFrameworkFiles(templateDir, targetDir, dryRun);
+    for (const p of copied) console.log(`  ${p}`);
+    console.log('');
+
+    console.log('Sanitizing template state...');
+    const sanitized = sanitizeState(targetDir, VERSION, dryRun);
+    console.log(`  ${sanitized.length} paths cleaned`);
+    console.log('');
+
+    console.log('Adapting policy for detected stack...');
+    const adapted = adaptPolicy(targetDir, profile.stack.language, profile.stack.packageManager, dryRun);
+    for (const p of adapted) console.log(`  ${p}`);
+    console.log('');
+  }
+
   // Write decision log
   const decisionLog = logDecisions(strategy);
   if (!dryRun) {
@@ -84,7 +133,6 @@ async function main() {
   }
 
   if (refreshContext) {
-    // Skip migration, just regenerate context
     console.log('Regenerating project context...');
     const result = applyPatches(targetDir, profile, strategy.decisions, dryRun);
     console.log(`  Created: ${result.filesCreated.join(', ') || '(none)'}`);
@@ -102,7 +150,6 @@ async function main() {
     }
     console.log('');
 
-    // Step 5: Execute
     console.log(dryRun ? 'Dry-run — no changes applied.' : 'Executing migration...');
     const result = executePlan(targetDir, plan, dryRun);
     if (result.success) {
@@ -117,7 +164,7 @@ async function main() {
     console.log('');
   }
 
-  // Step 6: Patch
+  // Step 5: Patch
   console.log('Generating project context...');
   const patchResult = applyPatches(targetDir, profile, strategy.decisions, dryRun);
   console.log(`  Created: ${patchResult.filesCreated.join(', ') || '(none)'}`);
