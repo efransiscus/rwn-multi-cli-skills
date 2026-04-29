@@ -236,7 +236,7 @@ Each CLI has its own optional local code-knowledge-graph tool — **CodeGraph** 
 
 Write boundaries: each CLI can only write to its own graph dir (`.codegraph/`, `.kimigraph/`, `.kirograph/`); cross-graph writes are blocked by the existing pretool hook. At adoption these are structural-only (no embeddings); semantic similarity can be enabled later via each tool's own opt-in config.
 
-See [.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md](./.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md) for the full rationale and per-tool tradeoffs.
+The canonical cross-CLI usage rules live in [`.ai/instructions/code-graphs/principles.md`](./.ai/instructions/code-graphs/principles.md) — AI agents in this project follow that SSOT automatically (via each CLI's native steering replica) when a graph is active, preferring graph queries over file reads for structural questions. See [.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md](./.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md) for the full rationale and per-tool tradeoffs.
 
 ## Directory map
 
@@ -358,6 +358,7 @@ This template is actively maintained. Expect iteration, expect some things to mo
 - [`.ai/sync.md`](./.ai/sync.md) — How to regenerate SSOT replicas
 - [`.ai/instructions/orchestrator-pattern/principles.md`](./.ai/instructions/orchestrator-pattern/principles.md) — Delegation architecture
 - [`.ai/instructions/agent-catalog/principles.md`](./.ai/instructions/agent-catalog/principles.md) — 13-agent roster
+- [`.ai/instructions/code-graphs/principles.md`](./.ai/instructions/code-graphs/principles.md) — Code-graphs SSOT (cross-CLI graph principles)
 - [`scripts/README.md`](./scripts/README.md) — Install script details
 - [`.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md`](./.ai/research/codegraph-kirograph-kimigraph-adoption-plan.md) — Code-graph adoption plan (CodeGraph/KimiGraph/KiroGraph)
 
