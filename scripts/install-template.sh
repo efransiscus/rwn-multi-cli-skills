@@ -21,6 +21,7 @@ TEMPLATE_SHA=""
 TARGET=""
 DRY_RUN=0
 MANIFEST=""   # path to a temp file tracking changed paths (relative to TARGET)
+ORIGINAL_BRANCH=""   # target's branch at install time (main/master/etc.)
 
 # ---------- logging ----------
 log()  { echo "[install] $*"; }
@@ -74,8 +75,8 @@ What it does (6 phases):
   5. Verify (hook tests + SSOT drift) and commit on the install branch.
 
 The script leaves you on the 'ai-template-install' branch with one commit.
-Phase 6 (merge to master) is printed as follow-up instructions; it is not
-executed.
+Phase 6 (merge to original branch) is printed as follow-up instructions; it is
+not executed.
 EOF
 }
 
@@ -155,6 +156,11 @@ phase0() {
   local head_sha
   head_sha="$(git rev-parse HEAD)"
   log "Target HEAD: $head_sha"
+
+  local original_branch
+  original_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")"
+  ORIGINAL_BRANCH="$original_branch"
+  log "Target original branch: $ORIGINAL_BRANCH"
 
   if [ "$DRY_RUN" -eq 0 ]; then
     echo "$head_sha" > "$TARGET/$ROLLBACK_FILE"
@@ -737,11 +743,11 @@ Phase 6 — follow-up (NOT executed by this script):
   cd "$TARGET"
   # 1. Review the commit
   git log -1 --stat
-  # 2. Merge to master
-  git checkout master
+  # 2. Merge to $ORIGINAL_BRANCH
+  git checkout $ORIGINAL_BRANCH
   git merge --no-ff $BRANCH
   # 3. Or roll back cleanly
-  git checkout master
+  git checkout $ORIGINAL_BRANCH
   git branch -D $BRANCH
   rm $ROLLBACK_FILE
 
