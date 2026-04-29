@@ -29,6 +29,11 @@ for (const f of ['CLAUDE.md', 'AGENTS.md', 'docs/architecture/0001-root-file-exc
     const dst = join(assetsDir, f);
     mkdirSync(dirname(dst), { recursive: true });
     copyFileSync(src, dst);
+    // npm strips top-level .gitignore from tarballs; bundle a no-dot copy so
+    // adapt-policy.ts can still find it in published mode.
+    if (f === '.gitignore') {
+      copyFileSync(src, join(assetsDir, 'gitignore'));
+    }
   }
 }
 

@@ -31,7 +31,12 @@ export function adaptPolicy(targetDir: string, language: string, packageManager:
   const targetGi = existsSync(gitignorePath) ? readFileSync(gitignorePath, 'utf-8') : '';
   if (!targetGi.includes(MARKER)) {
     const templateDir = resolveTemplateDir();
-    const templateGiPath = join(templateDir, '.gitignore');
+    // npm strips top-level .gitignore from tarballs, so the published bundle
+    // also ships a no-dot copy at assets/gitignore. Prefer the dotted name
+    // (dev/in-repo mode); fall back to the no-dot copy (published mode).
+    const templateGiPath = existsSync(join(templateDir, '.gitignore'))
+      ? join(templateDir, '.gitignore')
+      : join(templateDir, 'gitignore');
     if (existsSync(templateGiPath)) {
       const templateGi = readFileSync(templateGiPath, 'utf-8');
       const targetLines = new Set(targetGi.split('\n').map(l => l.trim()));

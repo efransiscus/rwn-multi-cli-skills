@@ -12,7 +12,8 @@ const FRAMEWORK_FILES = [
 
 export function resolveTemplateDir(): string {
   // Try bundled assets first (npm-published path)
-  const bundled = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', 'assets');
+  // dist/src/installer/copy-framework.js → package root → assets/
+  const bundled = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'assets');
   if (existsSync(resolve(bundled, '.ai'))) return bundled;
   // Fallback for in-repo dev: walk up to repo root
   let dir = dirname(fileURLToPath(import.meta.url));
